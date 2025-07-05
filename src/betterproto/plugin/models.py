@@ -301,14 +301,14 @@ class OutputTemplate:
         # Ensure warnings is imported if any message, field, or service method is deprecated
         has_deprecated = False
         # Check for deprecated messages (option deprecated = true)
-        if any(getattr(m, "deprecated", False) for m in self.messages):
+        if any(m.deprecated for m in self.messages):
             has_deprecated = True
         # Check for deprecated fields
         if any(x for x in self.messages if any(x.deprecated_fields)):
             has_deprecated = True
         # Check for deprecated service methods
         if any(
-            any(getattr(m.proto_obj.options, "deprecated", False) for m in s.methods)
+            any(m.proto_obj.options.deprecated for m in s.methods)
             for s in self.services
         ):
             has_deprecated = True
@@ -343,7 +343,11 @@ class MessageCompiler(ProtoContentBase):
                 self.output_file.enums.append(self)
             else:
                 self.output_file.messages.append(self)
-        self.deprecated = self.proto_obj.options.deprecated
+        # Only set deprecated for actual messages, not fields
+        if hasattr(self.proto_obj, 'options') and hasattr(self.proto_obj.options, 'deprecated'):
+            self.deprecated = self.proto_obj.options.deprecated
+        else:
+            self.deprecated = False
         super().__post_init__()
 
     @property
