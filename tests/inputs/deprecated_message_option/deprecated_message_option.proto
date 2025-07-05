@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package deprecated_message_option;
+
+message Foo {
+  option deprecated = true;
+  string old_field = 1;
+}
+
+message Bar {
+  string normal_field = 1;
+} 
