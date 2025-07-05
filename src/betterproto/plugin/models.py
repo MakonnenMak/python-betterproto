@@ -298,15 +298,11 @@ class OutputTemplate:
     def python_module_imports(self) -> Set[str]:
         imports = set()
 
-        # Ensure warnings is imported if any message, field, or service method is deprecated
         has_deprecated = False
-        # Check for deprecated messages (option deprecated = true)
         if any(m.deprecated for m in self.messages):
             has_deprecated = True
-        # Check for deprecated fields
         if any(x for x in self.messages if any(x.deprecated_fields)):
             has_deprecated = True
-        # Check for deprecated service methods
         if any(
             any(m.proto_obj.options.deprecated for m in s.methods)
             for s in self.services
