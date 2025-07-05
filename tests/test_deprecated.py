@@ -46,6 +46,26 @@ def test_message_with_deprecated_field_not_set_default(message):
         _ = Test(value=10).message
 
 
+def test_generated_code_has_warnings_import():
+    """Test that the generated code includes the warnings import statement.
+    
+    This test verifies the core fix for the NameError issue where generated code
+    would call warnings.warn() but not include 'import warnings'.
+    """
+    # Check the actual generated file content
+    with open('tests/output_betterproto/deprecated/__init__.py', 'r') as f:
+        content = f.read()
+    
+    # Verify warnings import is present
+    assert 'import warnings' in content, "warnings import should be present in generated code"
+    
+    # Verify warnings.warn calls are present
+    assert 'warnings.warn' in content, "warnings.warn calls should be present in generated code"
+    
+    # Verify DeprecationWarning is used
+    assert 'DeprecationWarning' in content, "DeprecationWarning should be used in generated code"
+
+
 @pytest.mark.asyncio
 async def test_service_with_deprecated_method():
     stub = TestServiceStub(MockChannel([Empty(), Empty()]))
